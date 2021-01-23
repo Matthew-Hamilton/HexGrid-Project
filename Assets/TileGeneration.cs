@@ -10,6 +10,7 @@ public class TileGeneration : MonoBehaviour
 
 
     public string Seed;
+    public bool UseRandomSeed = false;
 
     public List<List<Hexagon>> HexConstruction;
 
@@ -127,8 +128,8 @@ public class TileGeneration : MonoBehaviour
 
     public void Randomise()
     {
-
-        Seed = Time.time.ToString();
+        if(UseRandomSeed)
+            Seed = Time.time.ToString();
         System.Random MyRandom = new System.Random(Seed.GetHashCode());
         foreach (List<Hexagon> hexList in HexConstruction)
         {

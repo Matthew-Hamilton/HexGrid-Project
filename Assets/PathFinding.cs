@@ -6,10 +6,11 @@ public class PathFinding : MonoBehaviour
 {
     public Hexagon startPoint;
     public Hexagon endPoint;
+    public FollowPath character;
 
     List<Hexagon> openList;
     List<Hexagon> closedList;
-    List<Hexagon> path;
+    public List<Hexagon> path;
     
     Material PathMat;
     Material PathEndMat;
@@ -48,8 +49,11 @@ public class PathFinding : MonoBehaviour
             if (hit)
             {
                 SetStart(hit.collider.gameObject);
-                if(endPoint != null && startPoint != endPoint)
+                if (endPoint != null && startPoint != endPoint)
+                {
                     FindPath();
+                    character.SetPath(path);
+                }
             }
         }
         if (Input.GetMouseButtonDown(1))
@@ -60,16 +64,20 @@ public class PathFinding : MonoBehaviour
             if (hit)
             {
                 SetEnd(hit.collider.gameObject);
-                if(startPoint != null && startPoint != endPoint)
+                if (startPoint != null && startPoint != endPoint)
+                {
                     FindPath();
+                    character.SetPath(path);
+                }
             }
         }
     }
 
-    public void TracePath(Hexagon hex)
+    public void TracePath(Hexagon hex, bool reversed)
     {
         path.Clear();
         Debug.Log("Pathing:");
+        path.Add(hex);
         while(hex.parent != null)
         {
             path.Add(hex.parent);
@@ -97,12 +105,16 @@ public class PathFinding : MonoBehaviour
             hexagon.parent = null;
 
         }
+        if (!reversed)
+            path.Reverse();
     }
 
     public void FindPath()
     {
+        bool Reversed = false;
         if(endPoint.position.x < startPoint.position.x)
         {
+            Reversed = true;
             Hexagon tempHex = startPoint;
             startPoint = endPoint;
             endPoint = tempHex;
@@ -143,15 +155,15 @@ public class PathFinding : MonoBehaviour
             openList.Sort((x, y) => x.totalMoveDifficulty.CompareTo(y.totalMoveDifficulty));
 
             Debug.Log(openList[0].connections.Length - 1);
-            for (int i = 0; i < openList[0].connections.Length - 1; i++)
+            for (int i = 0; i < openList[0].connections.Length; i++)
             {
-                if (openList[0].connections[i] != null && openList[0].connections[i].tileType != "Water")
+                if (openList[0].connections[i] != null && openList[0].connections[i].tileType != "Water" && openList[0].connections[i].tileType != "Mountain")
                 {
                     if (openList[0].connections[i] == endPoint)
                     {
                         openList[0].connections[i].parent = openList[0];
                         closedList.Add(openList[0].connections[i]);
-                        TracePath(openList[0].connections[i]);
+                        TracePath(openList[0].connections[i], Reversed);
                         foundDest = true;
                         return;
                     }
@@ -165,7 +177,7 @@ public class PathFinding : MonoBehaviour
                             if (Difficulty < openList[0].connections[i].totalMoveDifficulty && openList[0].connections[i])
                             {
                                 openList[0].connections[i].totalMoveDifficulty = Difficulty;
-                                openList[0].connections[i].aproxMoveDistance = Difficulty + (endPoint.position - openList[0].connections[i].position).magnitude;
+                                openList[0].connections[i].aproxMoveDistance = Difficulty + (endPoint.position - openList[0].connections[i].position).sqrMagnitude;
                                 openList[0].connections[i].parent = openList[0];
                                 openList.Add(openList[0].connections[i]);
                             }

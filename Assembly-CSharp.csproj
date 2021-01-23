@@ -53,9 +53,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\CameraControl.cs" />
+    <Compile Include="Assets\PathFinding.cs" />
     <Compile Include="Assets\Hexagon.cs" />
     <Compile Include="Assets\TileGeneration.cs" />
-    <Compile Include="Assets\PathFinding.cs" />
+    <Compile Include="Assets\FollowPath.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
